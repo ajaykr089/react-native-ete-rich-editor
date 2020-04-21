@@ -33,7 +33,7 @@
   "bundleDependencies": false,
   "dependencies": {},
   "deprecated": false,
-  "description": "React Native Rich Editor",
+  "description": "React Native Rich Text Editor",
   "homepage": "https://github.com/etelligens/react-native-ete-rich-editor#readme",
   "main": "index.js",
   "name": "react-native-ete-rich-editor",
