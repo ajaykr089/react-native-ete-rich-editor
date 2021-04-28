@@ -6,7 +6,7 @@ import {createHTML} from './editor';
 
 const PlatformIOS = Platform.OS === 'ios';
 
-export default class RichTextEditor extends Component {
+export default class RichTextEditorSingle extends Component {
     // static propTypes = {
     //     initialContentHTML: PropTypes.string,
     //     editorInitializedCallback: PropTypes.func,
@@ -113,6 +113,7 @@ export default class RichTextEditor extends Component {
     onMessage(event) {
         try {
             const message = JSON.parse(event.nativeEvent.data);
+            console.log('message',message)
             switch (message.type) {
                 case messages.CONTENT_HTML_RESPONSE:
                     if (this.contentResolve) {
@@ -188,8 +189,9 @@ export default class RichTextEditor extends Component {
         const {html: viewHTML} = that.state;
         // webview dark theme bug
         const opacity = that.state.isInit ? 1 : 0;
+        console.log('props',that.props)
         return (
-            <>
+            <View style={{flex:1}} pointerEvents = {that.props.disableEditing === false ? 'auto' : 'none'}>
                 <WebView
                     useWebKit={true}
                     scrollEnabled={false}
@@ -208,7 +210,7 @@ export default class RichTextEditor extends Component {
                     onLoad={that.init}
                 />
                 {Platform.OS === 'android' && <TextInput ref={(ref) => (that._input = ref)} style={styles._input} />}
-            </>
+            </View>
         );
     }
 
@@ -222,7 +224,7 @@ export default class RichTextEditor extends Component {
 
         if (useContainer) {
             return (
-                <View style={[style,{height: height || Dimensions.get("window").height * 0.7,marginLeft:20,marginRight:20,borderColor:'#ccc',marginTop:10,marginRight:15,borderWidth:1,borderRadius:2}]}>
+                <View style={[style,{height: height || Dimensions.get("window").height * 0.7,borderColor:'#ccc',marginTop:10,marginRight:15,borderWidth:1,borderRadius:2}]}>
                     {this.renderWebView()}
                 </View>
             );

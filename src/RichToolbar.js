@@ -2,18 +2,18 @@ import React, {Component} from 'react';
 import {FlatList, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {actions} from './const';
 
-const defaultActions = [
-    actions.insertImage,
+export const defaultActions = [
+    actions.setUnderline,
     actions.setBold,
     actions.setItalic,
     actions.insertBulletsList,
     actions.insertOrderedList,
-    actions.insertLink
+    actions.insertLink,
 ];
 
 function getDefaultIcon() {
     const texts = {};
-    texts[actions.insertImage] = require('../img/icon_format_media.png');
+    texts[actions.setUnderline] = require('../img/underline.png');
     texts[actions.setBold] = require('../img/icon_format_bold.png');
     texts[actions.setItalic] = require('../img/icon_format_italic.png');
     texts[actions.insertBulletsList] = require('../img/icon_format_ul.png');
@@ -22,39 +22,46 @@ function getDefaultIcon() {
     return texts;
 }
 
-
 export default class RichToolbar extends Component {
-
     // static propTypes = {
-    //   getEditor: PropTypes.func.isRequired,
+    //   getEditor?: PropTypes.func.isRequired,
+    //   editor?: PropTypes.object,
     //   actions: PropTypes.array,
     //   onPressAddImage: PropTypes.func,
+    //   onInsertLink: PropTypes.func,
     //   selectedButtonStyle: PropTypes.object,
     //   iconTint: PropTypes.any,
     //   selectedIconTint: PropTypes.any,
     //   unselectedButtonStyle: PropTypes.object,
+    //   disabledButtonStyle: PropTypes.object,
+    //   disabledIconTint: PropTypes.any,
     //   renderAction: PropTypes.func,
     //   iconMap: PropTypes.object,
+    //   disabled: PropTypes.bool,
     // };
 
     static defaultProps = {
         actions: defaultActions,
+        disabled: false,
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            editor: undefined,
+            editor: void 0,
             selectedItems: [],
         };
     }
 
     shouldComponentUpdate(nextProps, nextState) {
         let that = this;
-        return nextProps.actions !== that.props.actions
-            || nextState.editor !== that.state.editor
-            || nextState.selectedItems !== that.state.selectedItems
-            || nextState.actions !== that.state.actions
+        return (
+            nextProps.actions !== that.props.actions ||
+            nextState.editor !== that.state.editor ||
+            nextState.selectedItems !== that.state.selectedItems ||
+            nextState.actions !== that.state.actions ||
+            nextState.style !== that.props.style
+        );
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -63,14 +70,14 @@ export default class RichToolbar extends Component {
             let {selectedItems = []} = prevState;
             return {
                 actions,
-                data: actions.map(action => ({action, selected: selectedItems.includes(action)}))
-            }
+                data: actions.map((action) => ({action, selected: selectedItems.includes(action)})),
+            };
         }
         return null;
     }
 
     componentDidMount() {
-        const editor = this.props.getEditor();
+        const {editor: {current: editor} = {current: this.props?.getEditor()}} = this.props;
         if (!editor) {
             throw new Error('Toolbar has no editor!');
         } else {
@@ -83,17 +90,21 @@ export default class RichToolbar extends Component {
         if (selectedItems !== this.state.selectedItems) {
             this.setState({
                 selectedItems,
-                data: this.state.actions.map(action => ({action, selected: selectedItems.includes(action)}))
+                data: this.state.actions.map((action) => ({action, selected: selectedItems.includes(action)})),
             });
         }
     }
 
     _getButtonSelectedStyle() {
-        return this.props.selectedButtonStyle ? this.props.selectedButtonStyle : styles.defaultSelectedButton;
+        return this.props.selectedButtonStyle && this.props.selectedButtonStyle;
     }
 
     _getButtonUnselectedStyle() {
-        return this.props.unselectedButtonStyle ? this.props.unselectedButtonStyle : styles.defaultUnselectedButton;
+        return this.props.unselectedButtonStyle && this.props.unselectedButtonStyle;
+    }
+
+    _getButtonDisabledStyle() {
+        return this.props.disabledButtonStyle && this.props.disabledButtonStyle;
     }
 
     _getButtonIcon(action) {
@@ -106,52 +117,11 @@ export default class RichToolbar extends Component {
         }
     }
 
-    _defaultRenderAction(action, selected) {
-        const icon = this._getButtonIcon(action);
-        const {iconSize = 50} = this.props;
-        return (
-            <TouchableOpacity
-                key={action}
-                style={[
-                    {height: iconSize, width: iconSize, justifyContent: 'center'},
-                    selected ? this._getButtonSelectedStyle() : this._getButtonUnselectedStyle()
-                ]}
-                onPress={() => this._onPress(action)}
-            >
-                {icon ? <Image source={icon} style={{
-                    tintColor: selected ? this.props.selectedIconTint : this.props.iconTint,
-                    height: iconSize,
-                    width: iconSize
-                }}/> : null}
-            </TouchableOpacity>
-        );
-    }
-
-    _renderAction(action, selected) {
-        return this.props.renderAction ?
-            this.props.renderAction(action, selected) :
-            this._defaultRenderAction(action, selected);
-    }
-
-    render() {
-        return (
-            <View
-                style={[{height: 50, backgroundColor: '#D3D3D3', alignItems: 'center'}, this.props.style]}
-            >
-                <FlatList
-                    horizontal
-                    keyExtractor={(item, index) => item.action + '-' + index}
-                    data={this.state.data}
-                    alwaysBounceHorizontal={false}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({item}) => this._renderAction(item.action, item.selected)}
-                />
-            </View>
-        );
-    }
-
     _onPress(action) {
+        const {onPressAddImage, onInsertLink} = this.props;
         switch (action) {
+            case actions.insertLink:
+                if (onInsertLink) return onInsertLink();
             case actions.setBold:
             case actions.setItalic:
             case actions.insertBulletsList:
@@ -175,21 +145,81 @@ export default class RichToolbar extends Component {
             case actions.setHR:
             case actions.setIndent:
             case actions.setOutdent:
-            case actions.insertLink:
-                this.state.editor._sendAction(action, "result");
+                this.state.editor.showAndroidKeyboard();
+                this.state.editor._sendAction(action, 'result');
                 break;
             case actions.insertImage:
-                if (this.props.onPressAddImage) {
-                    this.props.onPressAddImage();
-                }
+                onPressAddImage && onPressAddImage();
+                break;
+            default:
+                this.props[action] && this.props[action]();
                 break;
         }
+    }
+
+    _defaultRenderAction(action, selected) {
+        let that = this;
+        const icon = that._getButtonIcon(action);
+        const {iconSize = 50, disabled} = that.props;
+        const style = selected ? that._getButtonSelectedStyle() : that._getButtonUnselectedStyle();
+        const tintColor = disabled
+            ? that.props.disabledIconTint
+            : selected
+            ? that.props.selectedIconTint
+            : that.props.iconTint;
+        return (
+            <TouchableOpacity
+                key={action}
+                disabled={disabled}
+                style={[{width: iconSize, justifyContent: 'center'}, style]}
+                onPress={() => that._onPress(action)}>
+                {icon ? (
+                    typeof icon === 'function' ? (
+                        icon({selected, disabled, tintColor, iconSize})
+                    ) : (
+                        <Image
+                            source={icon}
+                            style={{
+                                tintColor: tintColor,
+                                height: iconSize,
+                                width: iconSize,
+                            }}
+                        />
+                    )
+                ) : null}
+            </TouchableOpacity>
+        );
+    }
+
+    _renderAction(action, selected) {
+        return this.props.renderAction
+            ? this.props.renderAction(action, selected)
+            : this._defaultRenderAction(action, selected);
+    }
+
+    render() {
+        const {style, disabled} = this.props;
+        const vStyle = [styles.barContainer, style, disabled && this._getButtonDisabledStyle()];
+        return (
+            <View style={vStyle}>
+                <FlatList
+                    horizontal
+                    keyboardShouldPersistTaps={'always'}
+                    keyExtractor={(item, index) => item.action + '-' + index}
+                    data={this.state.data}
+                    alwaysBounceHorizontal={false}
+                    showsHorizontalScrollIndicator={false}
+                    renderItem={({item}) => this._renderAction(item.action, item.selected)}
+                />
+            </View>
+        );
     }
 }
 
 const styles = StyleSheet.create({
-    defaultSelectedButton: {
-        backgroundColor: 'red'
+    barContainer: {
+        height: 50,
+        backgroundColor: '#D3D3D3',
+        alignItems: 'center',
     },
-    defaultUnselectedButton: {}
 });

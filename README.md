@@ -1,16 +1,16 @@
-# React Native Pell Rich Text Editor
+# React Native Ete Rich Text Editor
 
 
-[![NPM](https://img.shields.io/npm/v/react-native-pell-rich-editor.svg)](https://www.npmjs.com/package/react-native-pell-rich-editor)
+[![NPM](https://img.shields.io/npm/v/react-native-ete-rich-editor.svg)](https://www.npmjs.com/package/react-native-ete-rich-editor)
 
 ------
 
 > A fully functional Rich Text Editor for both Android and iOS
 
 ```
-yarn add react-native-pell-rich-editor
+yarn add react-native-ete-rich-editor
 or
-npm i react-native-pell-rich-editor
+npm i react-native-ete-rich-editor
 ```
 
 Also, follow instructions [here](https://github.com/react-native-community/react-native-webview) to add the native `react-native-webview` dependency.

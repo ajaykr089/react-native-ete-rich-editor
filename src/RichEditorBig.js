@@ -6,7 +6,7 @@ import {createHTML} from './editor';
 
 const PlatformIOS = Platform.OS === 'ios';
 
-export default class RichTextEditor extends Component {
+export default class RichTextEditorBig extends Component {
     // static propTypes = {
     //     initialContentHTML: PropTypes.string,
     //     editorInitializedCallback: PropTypes.func,
@@ -60,8 +60,9 @@ export default class RichTextEditor extends Component {
                     }),
             },
             keyboardHeight: 0,
-            height: 40,
+            height: 200,
             isInit: false,
+            key:0,
         };
         that.focusListeners = [];
     }
@@ -155,7 +156,7 @@ export default class RichTextEditor extends Component {
     setWebHeight = (height) => {
         // console.log(height);
         const {onHeightChange, useContainer} = this.props;
-        if (height !== this.state.height) {
+        if (height > 200) {
             useContainer && this.setState({height});
             onHeightChange && onHeightChange(height);
         }
@@ -188,9 +189,17 @@ export default class RichTextEditor extends Component {
         const {html: viewHTML} = that.state;
         // webview dark theme bug
         const opacity = that.state.isInit ? 1 : 0;
+        if(that.props.rerender === 0){
+            that.state.key = 0
+        }else if (that.props.rerender === 1){
+            that.state.key = that.props.rerender
+        }else{
+            that.state.key = that.props.rerender
+        }
         return (
-            <>
+            <View style={{flex:1}} pointerEvents = {that.props.disableEditing === false ? 'auto' : 'none'}>
                 <WebView
+                    key = {this.state.key}
                     useWebKit={true}
                     scrollEnabled={false}
                     hideKeyboardAccessoryView={false}
@@ -208,7 +217,7 @@ export default class RichTextEditor extends Component {
                     onLoad={that.init}
                 />
                 {Platform.OS === 'android' && <TextInput ref={(ref) => (that._input = ref)} style={styles._input} />}
-            </>
+            </View>
         );
     }
 
@@ -222,7 +231,7 @@ export default class RichTextEditor extends Component {
 
         if (useContainer) {
             return (
-                <View style={[style,{height: height || Dimensions.get("window").height * 0.7,marginLeft:20,marginRight:20,borderColor:'#ccc',marginTop:10,marginRight:15,borderWidth:1,borderRadius:2}]}>
+                <View rerender = {0} style={[style,{height: height || Dimensions.get("window").height * 0.7,borderColor:'#ccc',borderWidth:1,borderRadius:2}]}>
                     {this.renderWebView()}
                 </View>
             );
@@ -266,10 +275,6 @@ export default class RichTextEditor extends Component {
         this._sendAction(actions.content, 'focus');
     }
 
-    /**
-     * open android keyboard
-     * @platform android
-     */
     showAndroidKeyboard() {
         let that = this;
         if (Platform.OS === 'android') {
@@ -313,16 +318,11 @@ export default class RichTextEditor extends Component {
         initialFocus && !disabled && that.focusContentEditor();
         // no visible ?
         that.intervalHeight = setInterval(function () {
-            // console.log('setInterval')
             that._sendAction(actions.updateHeight);
         }, 0);
         that.setState({isInit: true});
     }
 
-    /**
-     * @deprecated please use onChange
-     * @returns {Promise}
-     */
     async getContentHtml() {
         return new Promise((resolve, reject) => {
             this.contentResolve = resolve;

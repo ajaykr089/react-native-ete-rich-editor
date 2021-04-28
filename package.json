@@ -1,8 +1,8 @@
 {
   "_from": "react-native-ete-rich-editor",
-  "_id": "react-native-ete-rich-editor@1.0.6",
+  "_id": "react-native-ete-rich-editor@1.0.7",
   "_inBundle": false,
-  "_integrity": "sha512-G3Hk/fEJ5uxnSa3589kxbS8WPasgNHKoKmA7lt22Bdyz6qSaBeZ786vJhA3/lb1YLrXrXwqV/v+xmQbl4mqVCg==",
+  "_integrity": "sha512-OsZbSRr5T2L+O29d0IrdS40QNCPk0NLEqs1iR2dbV7CzUMtMNhvINGdrtZREwSJMiBX4NI/gr/jTbLg8jiKT+w==",
   "_location": "/react-native-ete-rich-editor",
   "_phantomChildren": {},
   "_requested": {
@@ -19,10 +19,10 @@
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/react-native-ete-rich-editor/-/react-native-ete-rich-editor-1.0.6.tgz",
-  "_shasum": "5ea07c140bb57d27d2182d0422f95c955f3071aa",
+  "_resolved": "https://registry.npmjs.org/react-native-ete-rich-editor/-/react-native-ete-rich-editor-1.0.7.tgz",
+  "_shasum": "6c7cc6d270bdacfe0781f78faa23e9119486c40c",
   "_spec": "react-native-ete-rich-editor",
-  "_where": "/Users/etelligens/Documents/NpmRepos",
+  "_where": "/Users/developer/Desktop/KeyHabbits/mobile",
   "author": {
     "name": "etelligens",
     "email": "ajaykr089@gmail.com"
@@ -45,5 +45,5 @@
     "type": "git",
     "url": "git+https://github.com/etelligens/react-native-ete-rich-editor.git"
   },
-  "version": "1.0.6"
+  "version": "1.0.7"
 }

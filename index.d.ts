@@ -2,9 +2,73 @@ import {WebViewProps} from "react-native-webview";
 import {ImageSourcePropType, StyleProp, ViewStyle} from "react-native";
 import * as React from "react";
 
-declare module "react-native-pell-rich-editor" {
+declare module "react-native-ete-rich-editor" {
     /** The RichTextEditor accepts all props from Webview */
     export interface RichEditorProps extends WebViewProps {
+        /**
+         * Used for placement of editor
+         */
+        contentInset?: { top: number; bottom: number };
+
+        /**
+         * Wrap the editor webview inside a container.
+         * Default is true
+         */
+        useContainer?: boolean;
+        /**
+         * Wrap the editor content placeholder
+         * Default is empty string
+         */
+        placeholder?: string;
+        /**
+         * Styling for container or for Webview depending on useContainer prop
+         */
+        style?: StyleProp<ViewStyle>;
+
+        /**
+         * Initial content to be rendered inside WebView
+         */
+        initialContentHTML?: string;
+
+        /**
+         * Callback called after the editor has been initialized
+         */
+        editorInitializedCallback?: () => void;
+    }
+
+    export interface RichEditorBigProps extends WebViewProps {
+        /**
+         * Used for placement of editor
+         */
+        contentInset?: { top: number; bottom: number };
+
+        /**
+         * Wrap the editor webview inside a container.
+         * Default is true
+         */
+        useContainer?: boolean;
+        /**
+         * Wrap the editor content placeholder
+         * Default is empty string
+         */
+        placeholder?: string;
+        /**
+         * Styling for container or for Webview depending on useContainer prop
+         */
+        style?: StyleProp<ViewStyle>;
+
+        /**
+         * Initial content to be rendered inside WebView
+         */
+        initialContentHTML?: string;
+
+        /**
+         * Callback called after the editor has been initialized
+         */
+        editorInitializedCallback?: () => void;
+    }
+
+    export interface RichEditorSingleProps extends WebViewProps {
         /**
          * Used for placement of editor
          */
@@ -39,15 +103,63 @@ declare module "react-native-pell-rich-editor" {
     export type SelectionChangeListener = (items: string[]) => void;
 
     export type DefaultActions = [
-        "image",
+        "underline",
         "bold",
         "italic",
         "unorderedList",
         "orderedList",
-        "link"
+        "strikethrough"
     ];
 
     export class RichEditor extends React.Component<RichEditorProps> {
+        // Public API
+
+        getContentHtml: () => Promise<string>;
+
+        registerToolbar: (listener: SelectionChangeListener) => void;
+
+        /** Add a listener for the content focused event in WebView */
+        setContentFocusHandler: (listener: () => void) => void;
+
+        /**
+         * Set current HTML to be rendered
+         */
+        setContentHTML: (html: string) => void;
+
+        blurContentEditor: () => void;
+
+        focusContentEditor: () => void;
+
+        insertImage: (attributes: any) => void;
+
+        init: () => void;
+    }
+
+    export class RichEditorBig extends React.Component<RichEditorBigProps> {
+        // Public API
+
+        getContentHtml: () => Promise<string>;
+
+        registerToolbar: (listener: SelectionChangeListener) => void;
+
+        /** Add a listener for the content focused event in WebView */
+        setContentFocusHandler: (listener: () => void) => void;
+
+        /**
+         * Set current HTML to be rendered
+         */
+        setContentHTML: (html: string) => void;
+
+        blurContentEditor: () => void;
+
+        focusContentEditor: () => void;
+
+        insertImage: (attributes: any) => void;
+
+        init: () => void;
+    }
+
+    export class RichEditorSingle extends React.Component<RichEditorSingleProps> {
         // Public API
 
         getContentHtml: () => Promise<string>;
